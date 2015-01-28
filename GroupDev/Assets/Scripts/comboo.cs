@@ -11,6 +11,9 @@ public class comboo : MonoBehaviour {
 
 	float previousButtonDownTime;
 
+	
+	public int whocontroller = 1;
+
 	public List<char> combomove;
 	public List<string> sMoveList;
 	public List<string> sReleaseMoveList;
@@ -89,13 +92,27 @@ public class comboo : MonoBehaviour {
 
 	char ButtonCheck(){
 		char coutput = 'E';
-		if (Input.GetKeyDown(KeyCode.J)||Input.GetButtonDown("Punch")) {
-			coutput = 'P';
-			 
+		if (whocontroller == 1)
+		{
+			if (/*Input.GetKeyDown(KeyCode.J)||*/Input.GetButtonDown("Punch")) {
+				coutput = 'P';
+				
+			}
+			if (/*Input.GetKeyDown(KeyCode.L)||*/ Input.GetButtonDown("Kick")){
+				coutput = 'K';
+			}
 		}
-		if (Input.GetKeyDown(KeyCode.L)|| Input.GetButtonDown("Kick")){
-			coutput = 'K';
+		else if (whocontroller == 2)
+		{
+			if (/*Input.GetKeyDown(KeyCode.J)||*/Input.GetButtonDown("PunchP2")) {
+				coutput = 'P';
+				
+			}
+			if (/*Input.GetKeyDown(KeyCode.L)||*/ Input.GetButtonDown("KickP2")){
+				coutput = 'K';
+			}
 		}
+
 		return coutput;
 	}
 
@@ -134,23 +151,47 @@ public class comboo : MonoBehaviour {
 			AnimateCheck('E');
 			combomove.Clear();	
 		}
-		if (Input.GetAxis("Vertical") != 0)
+		if (whocontroller == 1)
 		{
-			//anim.SetTrigger(iWalkHash);
-			//animation.Play("Walking");
-			anim.SetBool("Walking",true);
+			if (Input.GetAxis("Vertical") != 0)
+			{
+				//anim.SetTrigger(iWalkHash);
+				//animation.Play("Walking");
+				anim.SetBool("Walking",true);
+			}
+			else
+			{
+				anim.SetBool("Walking",false);
+			}
+			if (Input.GetButton("Jump"))
+			{
+				anim.SetBool("Jump",true);
+			}
+			else
+			{
+				anim.SetBool("Jump",false);
+			}
 		}
-		else
+		if (whocontroller == 2)
 		{
-			anim.SetBool("Walking",false);
-		}
-		if (Input.GetButton("Jump"))
-		{
-			anim.SetBool("Jump",true);
-		}
-		else
-		{
-			anim.SetBool("Jump",false);
+			if (Input.GetAxis("VerticalP2") != 0)
+			{
+				//anim.SetTrigger(iWalkHash);
+				//animation.Play("Walking");
+				anim.SetBool("Walking",true);
+			}
+			else
+			{
+				anim.SetBool("Walking",false);
+			}
+			if (Input.GetButton("JumpP2"))
+			{
+				anim.SetBool("Jump",true);
+			}
+			else
+			{
+				anim.SetBool("Jump",false);
+			}
 		}
 	}
 	//Runs when object is destroyed

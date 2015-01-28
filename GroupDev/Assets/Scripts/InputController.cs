@@ -6,9 +6,31 @@ using System.Collections;
 public class InputController : MonoBehaviour {
 
 	private CharacterMotor motor;
+	private Animator anim;
+	AnimatorStateInfo CurrentState;
+
+	void OnTriggerEnter(Collider other) {
+		//Destroy(other.gameObject);
+		if (motor.whocontroller == 1 && other.collider.tag == "Player2")
+		{
+			//Destroy(other.gameObject);
+		}
+		else if (motor.whocontroller == 2 && other.collider.tag == "Player1")
+		{
+			//Destroy(other.gameObject);
+		}
+	}
+
 	public void Awake()
 	{
 		this.motor = (CharacterMotor)this.GetComponent(typeof(CharacterMotor));
+		Animator[] tempAnim;
+		tempAnim = GetComponentsInChildren<Animator>();
+		foreach(Animator subAnim in tempAnim)
+			this.anim = subAnim;
+
+		CurrentState = anim.GetCurrentAnimatorStateInfo (0);
+		//this.anim = (Animator)this.GetComponent(typeof(Animator));
 	}
 	public void Update()
 	{
@@ -19,7 +41,7 @@ public class InputController : MonoBehaviour {
 		}
 		else if (motor.whocontroller == 2)
 		{
-			inputControl = new Vector3(Input.GetAxis("Strafe2"), (float)0, Input.GetAxis("VerticalP2"));
+			inputControl = new Vector3(Input.GetAxis("StrafeP2"), (float)0, Input.GetAxis("VerticalP2"));
 		}
 
 
@@ -40,6 +62,18 @@ public class InputController : MonoBehaviour {
 		}
 		else
 		{
+			//if punch animation is playing stop the movement
+			//if (anim.animation.IsPlaying("Punch1"))
+			/*int hash = Animator.StringToHash ("Punch1");
+			if (CurrentState.nameHash == Animator.StringToHash ("Punch1"))
+			{*/
+			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
+			{
+				// Avoid any reload.
+				inputControl.z = 0;
+				inputControl.x = 0;
+				this.motor.inputMoveDirection = Vector3.zero;
+			}
 			Vector3 vector = inputControl;
 			if (vector != Vector3.zero)
 			{
@@ -55,7 +89,7 @@ public class InputController : MonoBehaviour {
 				this.motor.inputJump = Input.GetButton("Jump");
 			
 			if (motor.whocontroller == 2)
-				this.motor.inputJump = Input.GetButton("Jump2");
+				this.motor.inputJump = Input.GetButton("JumpP2");
 		}
 	}
 }
