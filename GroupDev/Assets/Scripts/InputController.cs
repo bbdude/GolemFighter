@@ -5,27 +5,39 @@ using System.Collections;
 [AddComponentMenu ("Character/InputController")]
 public class InputController : MonoBehaviour {
 
-	private CharacterMotor motor;
+	public CharacterMotor motor;
 	private Animator anim;
 	AnimatorStateInfo CurrentState;
-	HUD hudHolder = new HUD();
+	public HUD hudHolder = new HUD();
+	bool locknGrow = false;
+
 
 	void OnTriggerEnter(Collider other) {
 		//Destroy(other.gameObject);
+		if (motor.ghostControl || locknGrow)
+			return;
 		if (motor.whocontroller == 1 && other.collider.tag == "Player2")
 		{
 			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
 				hudHolder.HP_2 = hudHolder.HP_2 - 4;
 			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch2"))
 				hudHolder.HP_2 = hudHolder.HP_2 - 8;
+			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Kick1"))
+				hudHolder.HP_2 = hudHolder.HP_2 - 1;
+			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Kick2"))
+				hudHolder.HP_2 = hudHolder.HP_2 - 2;
 			//Destroy(other.gameObject);
 		}
 		else if (motor.whocontroller == 2 && other.collider.tag == "Player1")
 		{
 			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
 				hudHolder.HP_1 = hudHolder.HP_1 - 4;
-			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch2"))
+			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch2"))
 				hudHolder.HP_1 = hudHolder.HP_1 - 8;
+			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Kick1"))
+				hudHolder.HP_1 = hudHolder.HP_1 - 1;
+			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Kick2"))
+				hudHolder.HP_1 = hudHolder.HP_1 - 2;
 			//Destroy(other.gameObject);
 		}
 	}
@@ -56,52 +68,86 @@ public class InputController : MonoBehaviour {
 			inputControl = new Vector3(Input.GetAxis("StrafeP2"), (float)0, Input.GetAxis("VerticalP2"));
 		}
 
-
-		if (motor.ghostControl)
+		if (!locknGrow)
 		{
-			Vector3 vector = new Vector3(/*Input.GetAxis("Horizontal")*/0, (float)0, /*Input.GetAxis("Vertical")*/5);
-			if (vector != Vector3.zero)
+			if (motor.ghostControl)
 			{
-				float num = vector.magnitude;
-				vector /= num;
-				num = Mathf.Min((float)1, num);
-				num *= num;
-				vector *= num;
-			}
-			this.motor.inputMoveDirection = this.transform.rotation * vector;
+				Vector3 vector = new Vector3(/*Input.GetAxis("Horizontal")*/0, (float)0, /*Input.GetAxis("Vertical")*/5);
+				if (vector != Vector3.zero)
+				{
+					float num = vector.magnitude;
+					vector /= num;
+					num = Mathf.Min((float)1, num);
+					num *= num;
+					vector *= num;
+				}
+				this.motor.inputMoveDirection = this.transform.rotation * vector;
 
-			//this.motor.inputJump = Input.GetButton("Jump");
+				if (Input.GetButtonDown("Swap"))
+				{
+
+					RaycastHit hit;
+					Ray ray = new Ray(transform.position,transform.forward);
+					//transform.
+					int currentRotation = (int)transform.rotation.eulerAngles.y;
+
+					Vector3 targetPos = transform.position;
+					targetPos.z += 4;
+					Vector3 fwd = transform.TransformDirection(Vector3.forward);
+					//if (Physics.Raycast(transform.position, fwd, 4))
+					//if (Physics.Raycast(transform.position, , out hit, 100.0F))
+					
+					if(Physics.Raycast(ray, out hit, 1.0f))
+					{
+						hit.transform.SendMessage ("isGolem",this);
+					}
+					if (!motor.ghostControl)
+					{
+						transform.localScale = new Vector3(1,1,1);
+						locknGrow = true;
+					}
+				}
+				//this.motor.inputJump = Input.GetButton("Jump");
+			}
+			else
+			{
+				//if punch animation is playing stop the movement
+				//if (anim.animation.IsPlaying("Punch1"))
+				/*int hash = Animator.StringToHash ("Punch1");
+				if (CurrentState.nameHash == Animator.StringToHash ("Punch1"))
+				{*/
+				if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
+				{
+					// Avoid any reload.
+					inputControl.z = 0;
+					inputControl.x = 0;
+					this.motor.inputMoveDirection = Vector3.zero;
+				}
+				Vector3 vector = inputControl;
+				if (vector != Vector3.zero)
+				{
+					float num = vector.magnitude;
+					vector /= num;
+					num = Mathf.Min((float)1, num);
+					num *= num;
+					vector *= num;
+				}
+				this.motor.inputMoveDirection = this.transform.rotation * vector;
+				
+				if (motor.whocontroller == 1)
+					this.motor.inputJump = Input.GetButton("Jump");
+				
+				if (motor.whocontroller == 2)
+					this.motor.inputJump = Input.GetButton("JumpP2");
+			}
 		}
-		else
+		else if (locknGrow)
 		{
-			//if punch animation is playing stop the movement
-			//if (anim.animation.IsPlaying("Punch1"))
-			/*int hash = Animator.StringToHash ("Punch1");
-			if (CurrentState.nameHash == Animator.StringToHash ("Punch1"))
-			{*/
-			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
-			{
-				// Avoid any reload.
-				inputControl.z = 0;
-				inputControl.x = 0;
-				this.motor.inputMoveDirection = Vector3.zero;
-			}
-			Vector3 vector = inputControl;
-			if (vector != Vector3.zero)
-			{
-				float num = vector.magnitude;
-				vector /= num;
-				num = Mathf.Min((float)1, num);
-				num *= num;
-				vector *= num;
-			}
-			this.motor.inputMoveDirection = this.transform.rotation * vector;
-			
-			if (motor.whocontroller == 1)
-				this.motor.inputJump = Input.GetButton("Jump");
-			
-			if (motor.whocontroller == 2)
-				this.motor.inputJump = Input.GetButton("JumpP2");
+			Vector3 growScale = new Vector3(0.1f,0.1f,0.1f);
+			transform.localScale = transform.localScale + growScale;
+			transform.position = transform.position + growScale;
+			if (transform.localScale.x >= 2f)
+				locknGrow = false;
 		}
 	}
 }
