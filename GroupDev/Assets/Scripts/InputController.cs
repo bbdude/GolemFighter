@@ -8,15 +8,24 @@ public class InputController : MonoBehaviour {
 	private CharacterMotor motor;
 	private Animator anim;
 	AnimatorStateInfo CurrentState;
+	HUD hudHolder = new HUD();
 
 	void OnTriggerEnter(Collider other) {
 		//Destroy(other.gameObject);
 		if (motor.whocontroller == 1 && other.collider.tag == "Player2")
 		{
+			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
+				hudHolder.HP_2 = hudHolder.HP_2 - 4;
+			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch2"))
+				hudHolder.HP_2 = hudHolder.HP_2 - 8;
 			//Destroy(other.gameObject);
 		}
 		else if (motor.whocontroller == 2 && other.collider.tag == "Player1")
 		{
+			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
+				hudHolder.HP_1 = hudHolder.HP_1 - 4;
+			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch2"))
+				hudHolder.HP_1 = hudHolder.HP_1 - 8;
 			//Destroy(other.gameObject);
 		}
 	}
@@ -30,6 +39,9 @@ public class InputController : MonoBehaviour {
 			this.anim = subAnim;
 
 		CurrentState = anim.GetCurrentAnimatorStateInfo (0);
+		GameObject tempHudHolder = GameObject.Find("HUD");
+		hudHolder = (HUD)tempHudHolder.GetComponentInChildren<HUD>();
+			//GetComponentsInChildren<HingeJoint>();
 		//this.anim = (Animator)this.GetComponent(typeof(Animator));
 	}
 	public void Update()
