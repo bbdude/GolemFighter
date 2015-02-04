@@ -3,6 +3,7 @@ using System.Collections;
 
 [RequireComponent (typeof (CharacterMotor))]
 [AddComponentMenu ("Character/InputController")]
+[SerializeField]
 public class InputController : MonoBehaviour {
 
 	public CharacterMotor motor;
@@ -10,6 +11,7 @@ public class InputController : MonoBehaviour {
 	AnimatorStateInfo CurrentState;
 	public HUD hudHolder = new HUD();
 	bool locknGrow = false;
+	public Mesh ghost;
 
 
 	void OnTriggerEnter(Collider other) {
@@ -82,8 +84,8 @@ public class InputController : MonoBehaviour {
 					vector *= num;
 				}
 				this.motor.inputMoveDirection = this.transform.rotation * vector;
-
-				if (Input.GetButtonDown("Swap"))
+				bool swapCheck = (Input.GetButtonDown("Swap") && motor.whocontroller == 1) ||(Input.GetButtonDown("SwapP2") && motor.whocontroller == 2);
+				if (swapCheck)
 				{
 
 					RaycastHit hit;
@@ -103,6 +105,14 @@ public class InputController : MonoBehaviour {
 					}
 					if (!motor.ghostControl)
 					{
+						//Transform child = this.transform.GetChild(0);
+						//Mesh meshInstance  = Instantiate(ghost);
+						//GetComponent<MeshFilter>().mesh = meshInstance;
+						//
+						//child.renderer.enabled = false;
+						Mesh mesh = this.transform.GetChild(0).GetComponent<MeshFilter>().mesh;
+						mesh.Clear();
+						//mesh.Equals(ghost);// = ghost;
 						transform.localScale = new Vector3(1,1,1);
 						locknGrow = true;
 					}
@@ -146,7 +156,7 @@ public class InputController : MonoBehaviour {
 			Vector3 growScale = new Vector3(0.1f,0.1f,0.1f);
 			transform.localScale = transform.localScale + growScale;
 			transform.position = transform.position + growScale;
-			if (transform.localScale.x >= 2f)
+			if (transform.localScale.x >= 2.5f)
 				locknGrow = false;
 		}
 	}
