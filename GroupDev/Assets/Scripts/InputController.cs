@@ -12,6 +12,8 @@ public class InputController : MonoBehaviour {
 	public HUD hudHolder = new HUD();
 	bool locknGrow = false;
 	public Mesh ghost;
+	private Vector3 targetPoint;
+	public GameObject golem;
 
 
 	void OnTriggerEnter(Collider other) {
@@ -20,6 +22,7 @@ public class InputController : MonoBehaviour {
 			return;
 		if (motor.whocontroller == 1 && other.collider.tag == "Player2")
 		{
+			awake();
 			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
 				hudHolder.HP_2 = hudHolder.HP_2 - 4;
 			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch2"))
@@ -32,6 +35,7 @@ public class InputController : MonoBehaviour {
 		}
 		else if (motor.whocontroller == 2 && other.collider.tag == "Player1")
 		{
+			awake();
 			if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
 				hudHolder.HP_1 = hudHolder.HP_1 - 4;
 			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch2"))
@@ -43,18 +47,31 @@ public class InputController : MonoBehaviour {
 			//Destroy(other.gameObject);
 		}
 	}
-
 	public void Awake()
 	{
 		this.motor = (CharacterMotor)this.GetComponent(typeof(CharacterMotor));
+		GameObject tempHudHolder = GameObject.Find("HUD");
+		hudHolder = (HUD)tempHudHolder.GetComponentInChildren<HUD>();
+	}
+	void AddTagRecursively(Transform trans, string tag)
+	{
+		trans.gameObject.tag = tag;
+		if(trans.GetChildCount() > 0)
+			foreach(Transform t in trans)
+				AddTagRecursively(t, tag);
+	}
+	public void awake()
+	{
+
 		Animator[] tempAnim;
 		tempAnim = GetComponentsInChildren<Animator>();
 		foreach(Animator subAnim in tempAnim)
+		{
 			this.anim = subAnim;
+			break;
+		}
 
 		CurrentState = anim.GetCurrentAnimatorStateInfo (0);
-		GameObject tempHudHolder = GameObject.Find("HUD");
-		hudHolder = (HUD)tempHudHolder.GetComponentInChildren<HUD>();
 			//GetComponentsInChildren<HingeJoint>();
 		//this.anim = (Animator)this.GetComponent(typeof(Animator));
 	}
@@ -74,7 +91,7 @@ public class InputController : MonoBehaviour {
 		{
 			if (motor.ghostControl)
 			{
-				Vector3 vector = new Vector3(/*Input.GetAxis("Horizontal")*/0, (float)0, /*Input.GetAxis("Vertical")*/5);
+				Vector3 vector = new Vector3(/*Input.GetAxis("Horizontal")*/0, (float)0, /*Input.GetAxis("Vertical")*/0.2f);
 				if (vector != Vector3.zero)
 				{
 					float num = vector.magnitude;
@@ -113,8 +130,11 @@ public class InputController : MonoBehaviour {
 						Mesh mesh = this.transform.GetChild(0).GetComponent<MeshFilter>().mesh;
 						mesh.Clear();
 						//mesh.Equals(ghost);// = ghost;
-						transform.localScale = new Vector3(1,1,1);
+						targetPoint = hit.transform.position;
+						//transform.localScale = new Vector3(1,1,1);
 						locknGrow = true;
+						this.motor.inputMoveDirection = Vector3.zero;
+						//this.motor.grounded = true;
 					}
 				}
 				//this.motor.inputJump = Input.GetButton("Jump");
@@ -153,11 +173,33 @@ public class InputController : MonoBehaviour {
 		}
 		else if (locknGrow)
 		{
-			Vector3 growScale = new Vector3(0.1f,0.1f,0.1f);
-			transform.localScale = transform.localScale + growScale;
-			transform.position = transform.position + growScale;
-			if (transform.localScale.x >= 2.5f)
-				locknGrow = false;
+
+			//transform.position = Vector3.MoveTowards(transform.position,targetPoint,0.2f);
+
+
+			//Vector3 growScale = new Vector3(0.1f,0.1f,0.1f);
+			//transform.localScale = transform.localScale + growScale;
+			//transform.position = transform.position + growScale;
+			//if (transform.position == targetPoint)
+			//{
+			locknGrow = false;
+			Vector3 spawnPoint = transform.position;
+			Vector3 changeRotation;
+			changeRotation = transform.rotation.eulerAngles;
+			changeRotation.y += 90;
+			spawnPoint.y -= 0.15f;
+			GameObject tempGolem = Instantiate(golem, spawnPoint,Quaternion.Euler(changeRotation)) as GameObject;
+			//tempGolem.transform.rotation. += 90;
+			//tempGolem.transform.localScale = transform.localScale;
+			tempGolem.transform.parent = this.transform;
+			if (motor.whocontroller== 1)
+				//tempGolem.tag = "Player1";
+				AddTagRecursively (tempGolem.transform, "Player1");
+			else
+				AddTagRecursively (tempGolem.transform, "Player2");
+				//tempGolem.tag = "Player2";
+			awake();
+			//}
 		}
 	}
 }

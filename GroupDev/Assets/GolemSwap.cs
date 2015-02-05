@@ -16,7 +16,7 @@ public class GolemSwap : MonoBehaviour {
 
 		if (script.motor.whocontroller == 1)
 			script.hudHolder.HP_1 = currentHP;
-		else
+		else if (script.motor.whocontroller == 1)
 			script.hudHolder.HP_2 = currentHP;
 		killOff = true;
 	}
