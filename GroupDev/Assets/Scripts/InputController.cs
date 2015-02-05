@@ -31,6 +31,10 @@ public class InputController : MonoBehaviour {
 				hudHolder.HP_2 = hudHolder.HP_2 - 1;
 			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Kick2"))
 				hudHolder.HP_2 = hudHolder.HP_2 - 2;
+
+			Vector3 placment = other.transform.position + (Vector3.Normalize(  other.transform.position - transform.position) /4);
+			placment.y = other.transform.position.y;
+			other.transform.position = placment;
 			//Destroy(other.gameObject);
 		}
 		else if (motor.whocontroller == 2 && other.collider.tag == "Player1")
@@ -45,6 +49,10 @@ public class InputController : MonoBehaviour {
 			else if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Kick2"))
 				hudHolder.HP_1 = hudHolder.HP_1 - 2;
 			//Destroy(other.gameObject);
+			
+			Vector3 placment = other.transform.position + (Vector3.Normalize(  other.transform.position - transform.position) /4);
+			placment.y = other.transform.position.y;
+			other.transform.position = placment;
 		}
 	}
 	public void Awake()
@@ -91,7 +99,7 @@ public class InputController : MonoBehaviour {
 		{
 			if (motor.ghostControl)
 			{
-				Vector3 vector = new Vector3(/*Input.GetAxis("Horizontal")*/0, (float)0, /*Input.GetAxis("Vertical")*/0.2f);
+				Vector3 vector = new Vector3(/*Input.GetAxis("Horizontal")*/0, (float)0, /*Input.GetAxis("Vertical")*/5.0f);
 				if (vector != Vector3.zero)
 				{
 					float num = vector.magnitude;
@@ -187,7 +195,7 @@ public class InputController : MonoBehaviour {
 			Vector3 changeRotation;
 			changeRotation = transform.rotation.eulerAngles;
 			changeRotation.y += 90;
-			spawnPoint.y -= 0.15f;
+			spawnPoint.y -= 0.5f;
 			GameObject tempGolem = Instantiate(golem, spawnPoint,Quaternion.Euler(changeRotation)) as GameObject;
 			//tempGolem.transform.rotation. += 90;
 			//tempGolem.transform.localScale = transform.localScale;
