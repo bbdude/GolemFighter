@@ -11,6 +11,8 @@ public class InputController : MonoBehaviour {
 	AnimatorStateInfo CurrentState;
 	public HUD hudHolder = new HUD();
 	bool locknGrow = false;
+	bool lockJump = false;
+	float airTime = 0.0f;
 	public Mesh ghost;
 	private Vector3 targetPoint;
 	public GameObject golem;
@@ -54,6 +56,26 @@ public class InputController : MonoBehaviour {
 			placment.y = other.transform.position.y;
 			other.transform.position = placment;
 		}
+		else if (other.tag == "Bounce")
+		{
+
+			/*Rigidbody[] tempRigid;
+			Rigidbody rigid = new Rigidbody();
+			tempRigid = other.transform.GetComponentsInParent<Rigidbody>();
+			foreach(Rigidbody subRigid in tempRigid)
+			{
+				rigid = subRigid;
+				break;
+			}*/
+			//Vector3
+			this.motor.inputJump = true;
+			lockJump = true;
+			//motor.ApplyGravityAndJumping(Vector3.up*100.0f);
+			//motor.SetVelocity(this.transform.up*10000.0f);
+			//rigidbody.AddForce(this.transform.up*10000.0f,ForceMode.Acceleration);
+			//rigid.AddForce(Vector3.up*100.0f, ForceMode.Acceleration);
+			
+		}
 	}
 	public void Awake()
 	{
@@ -86,6 +108,19 @@ public class InputController : MonoBehaviour {
 	public void Update()
 	{
 		Vector3 inputControl = Vector3.zero;
+
+		if (lockJump)
+		{
+			motor.onPad = true;
+			airTime++;
+			if (airTime > 4 && motor.IsGrounded())
+			{
+				lockJump = false;
+				motor.onPad = false;
+				airTime = 0.0f;
+			}
+		}
+
 		if (motor.whocontroller == 1)
 		{
 			inputControl = new Vector3(Input.GetAxis("Strafe"), (float)0, Input.GetAxis("Vertical"));
@@ -171,12 +206,15 @@ public class InputController : MonoBehaviour {
 					vector *= num;
 				}
 				this.motor.inputMoveDirection = this.transform.rotation * vector;
-				
-				if (motor.whocontroller == 1)
-					this.motor.inputJump = Input.GetButton("Jump");
-				
-				if (motor.whocontroller == 2)
-					this.motor.inputJump = Input.GetButton("JumpP2");
+				if (!lockJump)
+				{
+					if (motor.whocontroller == 1)
+						this.motor.inputJump = Input.GetButton("Jump");
+					
+					if (motor.whocontroller == 2)
+						this.motor.inputJump = Input.GetButton("JumpP2");
+				}
+
 			}
 		}
 		else if (locknGrow)

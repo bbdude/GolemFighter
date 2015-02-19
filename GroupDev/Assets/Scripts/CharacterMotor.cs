@@ -23,6 +23,7 @@ public class CharacterMotor : MonoBehaviour
 	public bool ghostControl = true;
 	public int whocontroller = 1;
 	public bool useFixedUpdate;
+	public bool onPad = false;
 	[NonSerialized]
 	public Vector3 inputMoveDirection;
 	[NonSerialized]
@@ -227,7 +228,7 @@ public class CharacterMotor : MonoBehaviour
 		}
 		return velocity;
 	}
-	private Vector3 ApplyGravityAndJumping(Vector3 velocity)
+	public Vector3 ApplyGravityAndJumping(Vector3 velocity)
 	{
 		if (!this.inputJump || !this.canControl)
 		{
@@ -247,7 +248,10 @@ public class CharacterMotor : MonoBehaviour
 			velocity.y = this.movement.velocity.y - this.movement.gravity * Time.deltaTime;
 			if (this.jumping.jumping && this.jumping.holdingJumpButton && Time.time < this.jumping.lastStartTime + this.jumping.extraHeight / this.CalculateJumpVerticalSpeed(this.jumping.baseHeight))
 			{
-				velocity += this.jumping.jumpDir * this.movement.gravity * Time.deltaTime;
+				float jumpAddon = 1.0f;
+				if (onPad)
+					jumpAddon = 3.0f;
+				velocity += this.jumping.jumpDir * this.movement.gravity * Time.deltaTime * jumpAddon;
 			}
 			velocity.y = Mathf.Max(velocity.y, -this.movement.maxFallSpeed);
 		}
@@ -356,7 +360,10 @@ public class CharacterMotor : MonoBehaviour
 	}
 	public float CalculateJumpVerticalSpeed(float targetJumpHeight)
 	{
-		return Mathf.Sqrt((float)2 * targetJumpHeight * this.movement.gravity);
+		float jumpAddon = 2.0f;
+		if (onPad)
+			jumpAddon = 100.0f;
+		return Mathf.Sqrt((float)jumpAddon * targetJumpHeight * this.movement.gravity);
 	}
 	public bool IsJumping()
 	{
@@ -487,7 +494,7 @@ public class CharacterMotorMovement
 		});
 		this.maxGroundAcceleration = 50f;
 		this.maxAirAcceleration = 20f;
-		this.gravity = 10f;
+		this.gravity = 20f;
 		this.maxFallSpeed = 20f;
 		this.frameVelocity = Vector3.zero;
 		this.hitPoint = Vector3.zero;
