@@ -23,19 +23,19 @@ public class inputHolder {
 			//HasKey(string key);
 			if (PlayerPrefs.HasKey("punch"))
 			{
-				string temp = PlayerPrefs.GetString("punch","j");
-				punch = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+				string temp = PlayerPrefs.GetString("punch","J");
+				punch = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp);
 			}
 			if (PlayerPrefs.HasKey("kick"))
 			{
-				string temp = PlayerPrefs.GetString("kick","k");
-				kick = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+				string temp = PlayerPrefs.GetString("kick","K");
+				kick = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp);
 			}
 			if (PlayerPrefs.HasKey("jump"))
 			{
 				string temp = PlayerPrefs.GetString("jump","Space");
 				if (temp != "Space")
-					jump = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+					jump = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp);
 				else
 					jump = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp);
 			}
@@ -86,11 +86,11 @@ public class InputController : MonoBehaviour {
 	public HUD hudHolder = new HUD();
 	bool locknGrow = false;
 	bool lockJump = false;
-	public bool defaultControls = false;
 	float airTime = 0.0f;
 	public Mesh ghost;
 	private Vector3 targetPoint;
 	public GameObject golem;
+	public bool defaultControls = false;
     public inputHolder input = new inputHolder();
 
 

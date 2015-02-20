@@ -48,9 +48,9 @@ public class hoverScript : MonoBehaviour {
 			case "play":
 				//HasKey(string key);
 				if (!PlayerPrefs.HasKey("punch"))
-					PlayerPrefs.SetString("punch","j");
+					PlayerPrefs.SetString("punch","J");
 				if (!PlayerPrefs.HasKey("kick"))
-					PlayerPrefs.SetString("kick","k");
+					PlayerPrefs.SetString("kick","K");
 				if (!PlayerPrefs.HasKey("jump"))
 					PlayerPrefs.SetString("jump","Space");
 

@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour {
 	Transform groundCheck;
 	//float groundedRadius = .2f;
 	bool canJump = true;
+	public bool defaultControls = false;
+	public inputHolder input = new inputHolder();
 	//bool doubleJump = false;
 	Animator anim;
 
@@ -61,6 +63,7 @@ public class PlayerController : MonoBehaviour {
 	void Awake()
 	{
 		moveDirection = transform.TransformDirection(Vector3.forward);
+		input.onLoad(whocontroller);
 		/*// Setting up references.
 		groundCheck = transform.Find("GroundCheck");
 		anim = GetComponent<Animator>();*/
@@ -185,11 +188,29 @@ public class PlayerController : MonoBehaviour {
 		{
 			// Apply gravity
 			bool jumpButton;
+			if (!defaultControls)
+			{
+				if (whocontroller == 1)
+					jumpButton = Input.GetKeyDown(input.jump);
+				
+				if (whocontroller == 2)
+					jumpButton = Input.GetKeyDown(input.jump);
+			}
+			else
+			{
+				if (whocontroller == 1)
+					jumpButton = Input.GetButton("Jump");
+				
+				if (whocontroller == 2)
+					jumpButton = Input.GetButton("JumpP2");
+			}
+			/*
 			if (whocontroller == 1)
 				jumpButton = Input.GetButton("Jump");
 			
 			else if (whocontroller == 2)
 				jumpButton = Input.GetButton("JumpP2");
+				*/
 			
 			
 			// When we reach the apex of the jump we send out a message
@@ -248,19 +269,25 @@ public class PlayerController : MonoBehaviour {
 			// kill all inputs if not controllable.
 			Input.ResetInputAxes();
 		}
-		if (whocontroller == 1)
-			if (Input.GetButtonDown ("Jump"))
+
+
+		if (!defaultControls)
 		{
-			lastJumpButtonTime = Time.time;
+			if (whocontroller == 1 && Input.GetKeyDown(input.jump))
+				lastJumpButtonTime = Time.time;
+			
+			if (whocontroller == 2 && Input.GetKeyDown(input.jump))
+				lastJumpButtonTime = Time.time;
 		}
-		else if (whocontroller == 2)
-			if (Input.GetButtonDown ("JumpP2"))
+		else
 		{
-			lastJumpButtonTime = Time.time;
+			if (whocontroller == 1 && Input.GetButton("Jump"))
+				lastJumpButtonTime = Time.time;
+			
+			if (whocontroller == 2 && Input.GetButton("JumpP2"))
+				lastJumpButtonTime = Time.time;
 		}
-		//if (Input.GetButtonDown("Left"))
-		//{
-		//}
+
 		
 		UpdateSmoothedMovementDirection();
 		

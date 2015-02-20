@@ -26,6 +26,9 @@ public class comboo : MonoBehaviour {
 	int iKickHash;
 	int iWalkHash;
 
+	inputHolder input = new inputHolder();
+	bool defaultControls = false;
+
 
 
 	// Use this for initialization
@@ -46,7 +49,7 @@ public class comboo : MonoBehaviour {
 		iKickHash = Animator.StringToHash ("Kick1");
 		iWalkHash = Animator.StringToHash ("Walking");
 
-
+		input.onLoad(whocontroller);
 
 	}
 
@@ -92,24 +95,38 @@ public class comboo : MonoBehaviour {
 
 	char ButtonCheck(){
 		char coutput = 'E';
-		if (whocontroller == 1)
+
+		if (!defaultControls)
 		{
-			if (/*Input.GetKeyDown(KeyCode.J)||*/Input.GetButtonDown("Punch")) {
+			if (Input.GetKeyDown(input.punch)) {
 				coutput = 'P';
 				
 			}
-			if (/*Input.GetKeyDown(KeyCode.L)||*/ Input.GetButtonDown("Kick")){
+			if (Input.GetKeyDown(input.kick)){
 				coutput = 'K';
 			}
 		}
-		else if (whocontroller == 2)
+		else
 		{
-			if (/*Input.GetKeyDown(KeyCode.J)||*/Input.GetButtonDown("PunchP2")) {
-				coutput = 'P';
-				
+			if (whocontroller == 1)
+			{
+				if (Input.GetButtonDown("Punch")) {
+					coutput = 'P';
+					
+				}
+				if (Input.GetButtonDown("Kick")){
+					coutput = 'K';
+				}
 			}
-			if (/*Input.GetKeyDown(KeyCode.L)||*/ Input.GetButtonDown("KickP2")){
-				coutput = 'K';
+			else if (whocontroller == 2)
+			{
+				if (Input.GetButtonDown("PunchP2")) {
+					coutput = 'P';
+					
+				}
+				if (Input.GetButtonDown("KickP2")){
+					coutput = 'K';
+				}
 			}
 		}
 
@@ -163,7 +180,7 @@ public class comboo : MonoBehaviour {
 			{
 				anim.SetBool("Walking",false);
 			}
-			if (Input.GetButton("Jump"))
+			if ((!defaultControls && Input.GetKeyDown(input.jump)) || (defaultControls && Input.GetButton("Jump")))
 			{
 				anim.SetBool("Jump",true);
 			}
@@ -184,7 +201,7 @@ public class comboo : MonoBehaviour {
 			{
 				anim.SetBool("Walking",false);
 			}
-			if (Input.GetButton("JumpP2"))
+			if ((!defaultControls && Input.GetKeyDown(input.jump)) || (defaultControls && Input.GetButton("JumpP2")))
 			{
 				anim.SetBool("Jump",true);
 			}
