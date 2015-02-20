@@ -67,6 +67,8 @@ public class controlScript: MonoBehaviour {
 
 
 			//text = GetComponent<Text>();
+			//if (Input.inputString != "")
+			//{
 			char input = Input.inputString[0];
 			string inputAS = input.ToString();
 			switch(destination)
@@ -85,7 +87,7 @@ public class controlScript: MonoBehaviour {
 				break;
 			case "kick":
                     if (pc2)
-                        PlayerPrefs.SetString("punchP2",inputAS);
+                        PlayerPrefs.SetString("kickP2",inputAS);
                     else
     				    PlayerPrefs.SetString("kick",inputAS);
     				if (inputAS != " ")
@@ -95,7 +97,7 @@ public class controlScript: MonoBehaviour {
 				break;
 			case "jump":
                     if (pc2)
-                        PlayerPrefs.SetString("punchP2",inputAS);
+                        PlayerPrefs.SetString("jumpP2",inputAS);
                     else
                         PlayerPrefs.SetString("jump",inputAS);
     				if (inputAS != " ")
@@ -104,6 +106,7 @@ public class controlScript: MonoBehaviour {
     					text.text = "Space";
 				break;
             }
+			//}
 			click = false;
         }
 		//click = false;

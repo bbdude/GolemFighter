@@ -1,10 +1,84 @@
-using UnityEngine;
+#pragma strict
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine;
 
+[Serializable]
+public class inputHolder {
+	public KeyCode punch;
+	public KeyCode kick;
+	public KeyCode jump;
+
+	public inputHolder()
+	{
+
+	}
+	//public ~inputHolder(){}
+	public void onLoad(int playerOne)
+	{
+		if (playerOne == 1)
+		{
+			//HasKey(string key);
+			if (PlayerPrefs.HasKey("punch"))
+			{
+				string temp = PlayerPrefs.GetString("punch","j");
+				punch = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+			}
+			if (PlayerPrefs.HasKey("kick"))
+			{
+				string temp = PlayerPrefs.GetString("kick","k");
+				kick = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+			}
+			if (PlayerPrefs.HasKey("jump"))
+			{
+				string temp = PlayerPrefs.GetString("jump","Space");
+				if (temp != "Space")
+					jump = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+				else
+					jump = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp);
+			}
+		}
+		else
+		{
+			if (PlayerPrefs.HasKey("punchP2"))
+			{
+				string temp = PlayerPrefs.GetString("punchP2",";");
+				if (temp == ";")
+					punch = KeyCode.Semicolon;
+				else
+					punch = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+			}
+			if (PlayerPrefs.HasKey("kickP2"))
+			{
+				string temp = PlayerPrefs.GetString("kickP2","'");
+				if (temp == "'")
+					kick = KeyCode.Quote;
+				else
+					kick = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+			}
+			if (PlayerPrefs.HasKey("jumpP2"))
+			{
+				string temp = PlayerPrefs.GetString("jumpP2","[5]");
+				
+				if (temp == "[5]")
+					jump = KeyCode.Keypad5;
+				else if (temp != "Space")
+					jump = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp.ToUpper());
+				else
+					jump = (KeyCode)System.Enum.Parse(typeof(KeyCode), temp);
+			}
+		}
+	}
+}
 [RequireComponent (typeof (CharacterMotor))]
 [AddComponentMenu ("Character/InputController")]
 [SerializeField]
+[Serializable]
 public class InputController : MonoBehaviour {
+
+
 
 	public CharacterMotor motor;
 	private Animator anim;
@@ -12,10 +86,12 @@ public class InputController : MonoBehaviour {
 	public HUD hudHolder = new HUD();
 	bool locknGrow = false;
 	bool lockJump = false;
+	public bool defaultControls = false;
 	float airTime = 0.0f;
 	public Mesh ghost;
 	private Vector3 targetPoint;
 	public GameObject golem;
+    public inputHolder input = new inputHolder();
 
 
 	void OnTriggerEnter(Collider other) {
@@ -82,6 +158,10 @@ public class InputController : MonoBehaviour {
 		this.motor = (CharacterMotor)this.GetComponent(typeof(CharacterMotor));
 		GameObject tempHudHolder = GameObject.Find("HUD");
 		hudHolder = (HUD)tempHudHolder.GetComponentInChildren<HUD>();
+	}
+	public void Start()
+	{
+		input.onLoad(this.motor.whocontroller);
 	}
 	void AddTagRecursively(Transform trans, string tag)
 	{
@@ -184,11 +264,6 @@ public class InputController : MonoBehaviour {
 			}
 			else
 			{
-				//if punch animation is playing stop the movement
-				//if (anim.animation.IsPlaying("Punch1"))
-				/*int hash = Animator.StringToHash ("Punch1");
-				if (CurrentState.nameHash == Animator.StringToHash ("Punch1"))
-				{*/
 				if (this.anim.GetCurrentAnimatorStateInfo(0).IsName("Punch1"))
 				{
 					// Avoid any reload.
@@ -208,26 +283,28 @@ public class InputController : MonoBehaviour {
 				this.motor.inputMoveDirection = this.transform.rotation * vector;
 				if (!lockJump)
 				{
-					if (motor.whocontroller == 1)
-						this.motor.inputJump = Input.GetButton("Jump");
-					
-					if (motor.whocontroller == 2)
-						this.motor.inputJump = Input.GetButton("JumpP2");
+					if (!defaultControls)
+					{
+						if (motor.whocontroller == 1)
+							this.motor.inputJump = Input.GetKey(input.jump);
+						
+						if (motor.whocontroller == 2)
+							this.motor.inputJump = Input.GetKey(input.jump);
+					}
+					else
+					{
+						if (motor.whocontroller == 1)
+							this.motor.inputJump = Input.GetButton("Jump");
+						
+						if (motor.whocontroller == 2)
+							this.motor.inputJump = Input.GetButton("JumpP2");
+					}
 				}
 
 			}
 		}
 		else if (locknGrow)
 		{
-
-			//transform.position = Vector3.MoveTowards(transform.position,targetPoint,0.2f);
-
-
-			//Vector3 growScale = new Vector3(0.1f,0.1f,0.1f);
-			//transform.localScale = transform.localScale + growScale;
-			//transform.position = transform.position + growScale;
-			//if (transform.position == targetPoint)
-			//{
 			locknGrow = false;
 			Vector3 spawnPoint = transform.position;
 			Vector3 changeRotation;
@@ -235,15 +312,11 @@ public class InputController : MonoBehaviour {
 			changeRotation.y += 90;
 			spawnPoint.y -= 0.5f;
 			GameObject tempGolem = Instantiate(golem, spawnPoint,Quaternion.Euler(changeRotation)) as GameObject;
-			//tempGolem.transform.rotation. += 90;
-			//tempGolem.transform.localScale = transform.localScale;
 			tempGolem.transform.parent = this.transform;
 			if (motor.whocontroller== 1)
-				//tempGolem.tag = "Player1";
 				AddTagRecursively (tempGolem.transform, "Player1");
 			else
 				AddTagRecursively (tempGolem.transform, "Player2");
-				//tempGolem.tag = "Player2";
 			awake();
 			//}
 		}
