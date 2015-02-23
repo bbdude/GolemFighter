@@ -28,6 +28,9 @@ public class controlScript: MonoBehaviour {
 		case '.':
 			returnVal = "Period";
 			break;
+		case ' ':
+			returnVal = "Space";
+				break;
 		case '/':
 			returnVal = "Slash";
 			break;
@@ -122,7 +125,8 @@ public class controlScript: MonoBehaviour {
 			//if (Input.inputString != "")
 			//{
 			char input = Input.inputString[0];
-			string inputAS = input.ToString();
+			string inputAS = sendThroughParse(input);
+
 			switch(destination)
 			{
 			case "movement":
@@ -132,30 +136,24 @@ public class controlScript: MonoBehaviour {
                         PlayerPrefs.SetString("punchP2",inputAS);
                     else
                         PlayerPrefs.SetString("punch",inputAS);
-    				if (inputAS != " ")
-    					text.text = inputAS.ToUpper();
-    				else
-    					text.text = "Space";
+    				//if (inputAS != " ")
+    					text.text = inputAS;
 				break;
 			case "kick":
                     if (pc2)
                         PlayerPrefs.SetString("kickP2",inputAS);
                     else
     				    PlayerPrefs.SetString("kick",inputAS);
-    				if (inputAS != " ")
-    					text.text = inputAS.ToUpper();
-    				else
-    					text.text = "Space";
+    				//if (inputAS != " ")
+    					text.text = inputAS;
 				break;
 			case "jump":
                     if (pc2)
                         PlayerPrefs.SetString("jumpP2",inputAS);
                     else
                         PlayerPrefs.SetString("jump",inputAS);
-    				if (inputAS != " ")
-    					text.text = inputAS.ToUpper();
-    				else
-    					text.text = "Space";
+    				//if (inputAS != " ")
+    					text.text = inputAS;
 				break;
             }
 			//}
